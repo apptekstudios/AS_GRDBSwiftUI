@@ -6,7 +6,7 @@ import GRDB
 
 /// An observable object that holds a `MutablePersistableRecord` and allows mutation + updating the database row
 @dynamicMemberLookup
-public class GRDBMutableRecord<Value: MutablePersistableRecord>: ObservableObject
+public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableObject
 {
 	let database: DatabaseWriter?
 
@@ -79,9 +79,9 @@ public class GRDBMutableRecord<Value: MutablePersistableRecord>: ObservableObjec
 		autosavePublisher = nil
 	}
 
-	public static func placeholder(value: Value) -> GRDBMutableRecord
+	public static func placeholder(value: Value) -> GRDBPersistableRecord
 	{
-		GRDBMutableRecord(placeholderValue: value)
+		GRDBPersistableRecord(placeholderValue: value)
 	}
 
 	/// Allows for directly accessing/editing variables in the stored value

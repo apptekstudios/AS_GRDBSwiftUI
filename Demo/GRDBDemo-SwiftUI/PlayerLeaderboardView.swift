@@ -93,7 +93,7 @@ struct PlayerRow: View
 
 	var body: some View
 	{
-		NavigationLink(destination: PlayerEditingView(player: GRDBMutableRecord(database: AppDatabase.shared.db, value: player, autoSave: false))) {
+		NavigationLink(destination: PlayerEditingView(player: GRDBPersistableRecord(database: AppDatabase.shared.db, value: player, autoSave: false))) {
 			HStack {
 				Text(player.name)
 				Spacer()
