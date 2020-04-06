@@ -1,25 +1,33 @@
+// AS_GRDBSwiftUI. Created by Apptek Studios 2020
+
+import Combine
 import Foundation
 import GRDB
-import Combine
 
 /// An observable object that holds a `MutablePersistableRecord` and allows mutation + updating the database row
 @dynamicMemberLookup
-public class GRDBMutableRecord<Value: MutablePersistableRecord>: ObservableObject {
+public class GRDBMutableRecord<Value: MutablePersistableRecord>: ObservableObject
+{
 	let database: DatabaseWriter?
-	
-	public var value: Value {
-		willSet {
+
+	public var value: Value
+	{
+		willSet
+		{
 			objectWillChange.send()
 		}
-		didSet {
+		didSet
+		{
 			autosavePublisher?.send()
 		}
 	}
-	
+
 	/// Call this function to manually save any changes to the record to the database
-	public func commitChanges() throws {
+	public func commitChanges() throws
+	{
 		try database?.write {
-			do {
+			do
+			{
 				try value.update($0)
 			}
 			catch PersistenceError.recordNotFound {
@@ -29,45 +37,53 @@ public class GRDBMutableRecord<Value: MutablePersistableRecord>: ObservableObjec
 			}
 		}
 	}
-	
+
 	private let autosavePublisher: PassthroughSubject<Void, Never>?
 	private var autosaveSubscription: AnyCancellable?
-	
+
 	/// Initialise a GRDB mutable record with a value
 	/// - parameter database: The database to save any changes to.
 	/// - parameter value: The initial value
 	/// - parameter autoSave: Whether to automatically commit any changes to the database. Default = true
-	public init(database: DatabaseWriter, value: Value, autoSave: Bool = true) {
+	public init(database: DatabaseWriter, value: Value, autoSave: Bool = true)
+	{
 		self.database = database
 		self.value = value
-		
-		if autoSave {
+
+		if autoSave
+		{
 			autosavePublisher = PassthroughSubject()
 			autosaveSubscription = autosavePublisher?
 				.throttle(for: 0.1, scheduler: RunLoop.main, latest: true)
 				.sink { [weak self] in
-					do {
+					do
+					{
 						try self?.commitChanges()
 					}
-					catch {
+					catch
+					{
 						// Ignoring errors for autosave
 					}
-			}
-		} else {
-			self.autosavePublisher = nil
+				}
+		}
+		else
+		{
+			autosavePublisher = nil
 		}
 	}
-	
-	private init(placeholderValue: Value) {
-		self.database = nil
-		self.value = placeholderValue
-		self.autosavePublisher = nil
+
+	private init(placeholderValue: Value)
+	{
+		database = nil
+		value = placeholderValue
+		autosavePublisher = nil
 	}
-	public static func placeholder(value: Value) -> GRDBMutableRecord {
+
+	public static func placeholder(value: Value) -> GRDBMutableRecord
+	{
 		GRDBMutableRecord(placeholderValue: value)
 	}
-	
-	
+
 	/// Allows for directly accessing/editing variables in the stored value
 	public subscript<T>(dynamicMember keyPath: WritableKeyPath<Value, T>) -> T
 	{
@@ -75,4 +91,3 @@ public class GRDBMutableRecord<Value: MutablePersistableRecord>: ObservableObjec
 		set { value[keyPath: keyPath] = newValue }
 	}
 }
-

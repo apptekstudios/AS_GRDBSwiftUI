@@ -1,26 +1,22 @@
-//
-//  ContentViewModel.swift
-//  GRDBDemo-SwiftUI
-//
-//  Created by Toby Brennan on 6/4/20.
-//  Copyright © 2020 Github-ApptekStudios. All rights reserved.
-//
+// AS_GRDBSwiftUI. Created by Apptek Studios 2020
 
-import Foundation
 import AS_GRDBSwiftUI
+import Foundation
 
 /// A Hall of Fame
-struct HallOfFame {
+struct HallOfFame
+{
 	/// Total number of players
 	var playerCount: Int = 0
-	
+
 	/// The best ones
 	var bestPlayers: [Player] = []
-	
-	struct DatabaseRequest: GRDBFetchRequest {
+
+	struct DatabaseRequest: GRDBFetchRequest
+	{
 		var maxPlayerCount = 100
 		var sortOrder: Player.SortOrder = .score
-		
+
 		var defaultResult = HallOfFame()
 		func request(db: Database) throws -> HallOfFame {
 			let playerCount = try Player.fetchCount(db)

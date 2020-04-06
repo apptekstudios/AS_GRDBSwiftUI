@@ -1,0 +1,25 @@
+# file options
+
+--symlinks ignore
+--swiftversion 5.2
+
+--exclude Package.swift
+
+# format options
+
+--header "AS_GRDBSwiftUI. Created by Apptek Studios 2020"
+--allman true
+--indent tabs
+--tabwidth 4
+--closingparen same-line
+--commas inline
+--comments indent
+--decimalgrouping 3,5
+--exponentcase lowercase
+--exponentgrouping disabled
+--fractiongrouping disabled
+--ifdef outdent
+--importgrouping testable-top
+--stripunusedargs closure-only
+--wraparguments before-first
+--wrapcollections after-first

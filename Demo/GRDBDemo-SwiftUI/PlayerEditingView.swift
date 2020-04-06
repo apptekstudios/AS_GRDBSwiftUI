@@ -1,32 +1,30 @@
-//
-//  PlayerEditingView.swift
-//  GRDBDemo-SwiftUI
-//
-//  Created by Toby Brennan on 5/4/20.
-//  Copyright © 2020 Github-ApptekStudios. All rights reserved.
-//
+// AS_GRDBSwiftUI. Created by Apptek Studios 2020
 
-import SwiftUI
-import GRDBCombine
 import AS_GRDBSwiftUI
+import GRDBCombine
+import SwiftUI
 
-struct PlayerEditingView: View {
+struct PlayerEditingView: View
+{
 	@ObservedObject
 	var player: GRDBMutableRecord<Player>
-	
+
 	@Environment(\.presentationMode) var presentation
-	
-	var scoreAsString: Binding<String> {
+
+	var scoreAsString: Binding<String>
+	{
 		Binding(get: {
-			return "\(self.player.score)"
-		}) { (newValue) in
-			if let int = Int(newValue) {
+			"\(self.player.score)"
+		}) { newValue in
+			if let int = Int(newValue)
+			{
 				self.player.score = int
 			}
 		}
 	}
-	
-    var body: some View {
+
+	var body: some View
+	{
 		NavigationView {
 			Form {
 				HStack {
@@ -42,14 +40,16 @@ struct PlayerEditingView: View {
 						.multilineTextAlignment(.trailing)
 				}
 				Button(action: {
-					do {
+					do
+					{
 						try self.player.commitChanges()
 						self.presentation.wrappedValue.dismiss()
 					}
-					catch {
+					catch
+					{
 						// Do something if unable to save (eg. notify user)
 					}
-					
+
 				}) {
 					Text("Apply Changes")
 				}
@@ -57,13 +57,15 @@ struct PlayerEditingView: View {
 			.textFieldStyle(RoundedBorderTextFieldStyle())
 			.navigationBarTitle("Edit player")
 		}
-    }
+	}
 }
 
-struct PlayerEditingView_Previews: PreviewProvider {
-    static var previews: some View {
+struct PlayerEditingView_Previews: PreviewProvider
+{
+	static var previews: some View
+	{
 		PlayerEditingView(player: .init(database: AppDatabase.shared.db, value: Player(name: "Test player", score: 99)))
-    }
+	}
 }
 
 import GRDB
