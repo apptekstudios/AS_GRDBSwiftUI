@@ -14,7 +14,7 @@ public protocol GRDBFetchRequest
 	func request(db: GRDB.Database) throws -> Result
 }
 
-public struct GRDBFetchRequestSimple<FetchResult>
+public struct GRDBSimpleFetchRequest<FetchResult>
 {
 	public typealias RequestClosure = ((_ database: Database) throws -> FetchResult)
 
