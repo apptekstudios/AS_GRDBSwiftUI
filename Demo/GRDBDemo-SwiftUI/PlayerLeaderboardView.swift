@@ -12,8 +12,8 @@ import AS_GRDBSwiftUI
 
 
 
-struct ContentView: View {
-	@ObservedObject var databaseRequest = DatabaseFetch(db: AppDatabase.shared.db, request: ContentViewModel.hallOfFameRequest(maxPlayerCount: 100, sorting: .name))
+struct PlayerLeaderboardView: View {
+	@ObservedObject var databaseFetch = GRDBFetchHandler(db: AppDatabase.shared.db, request: HallOfFame.DatabaseRequest())
 	
 	var body: some View {
 		return NavigationView {
@@ -24,9 +24,9 @@ struct ContentView: View {
 			}
 			.navigationBarItems(trailing:
 				Button(action: {
-					self.databaseRequest.request.config.toggle()
+					self.databaseFetch.request.sortOrder.toggle()
 					}) {
-						Text("Sort: \(self.databaseRequest.request.config.displayLabel)")
+						Text("Sort: \(self.databaseFetch.request.sortOrder.displayLabel)")
 				}
 	)
 			.navigationBarTitle(Text("Leaderboard"))
@@ -34,7 +34,7 @@ struct ContentView: View {
 	}
 	
 	var count: some View {
-		Text("\(databaseRequest.result.playerCount) \(databaseRequest.result.playerCount == 1 ? "Player" : "Players") in total")
+		Text("\(databaseFetch.result.playerCount) \(databaseFetch.result.playerCount == 1 ? "Player" : "Players") in total")
 			.padding()
 			.frame(maxWidth: .infinity)
 			.background(Color(.secondarySystemBackground))
@@ -42,11 +42,11 @@ struct ContentView: View {
 	
 	var list: some View {
 		List {
-			ForEach(databaseRequest.result.bestPlayers) {
+			ForEach(databaseFetch.result.bestPlayers) {
 				PlayerRow(player: $0)
 			}
 			.onDelete { indexSet in
-				let toDelete = indexSet.map { self.databaseRequest.result.bestPlayers[$0] }
+				let toDelete = indexSet.map { self.databaseFetch.result.bestPlayers[$0] }
 				
 				do {
 					//You should probably handle this in your data controller rather than in the view code
@@ -102,7 +102,7 @@ struct PlayerRow: View {
 
 
 struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+	static var previews: some View {
+		PlayerLeaderboardView()
     }
 }
