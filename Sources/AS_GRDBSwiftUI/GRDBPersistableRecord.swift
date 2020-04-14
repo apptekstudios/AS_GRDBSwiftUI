@@ -12,13 +12,17 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 
 	public var value: Value
 	{
+		get { _value }
+		set {
+			_value = newValue
+			autosavePublisher?.send()
+		}
+	}
+	
+	private var _value: Value {
 		willSet
 		{
 			objectWillChange.send()
-		}
-		didSet
-		{
-			autosavePublisher?.send()
 		}
 	}
 
@@ -31,9 +35,7 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 				try value.update($0)
 			}
 			catch PersistenceError.recordNotFound {
-				var insertedValue = value
-				try insertedValue.insert($0)
-				self.value = insertedValue
+				try _value.insert($0)
 			}
 		}
 	}
@@ -48,7 +50,7 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 	public init(database: DatabaseWriter, value: Value, autoSave: Bool = true)
 	{
 		self.database = database
-		self.value = value
+		self._value = value
 
 		if autoSave
 		{
@@ -75,11 +77,11 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 	private init(placeholderValue: Value)
 	{
 		database = nil
-		value = placeholderValue
+		_value = placeholderValue
 		autosavePublisher = nil
 	}
 
-	public static func placeholder(value: Value) -> GRDBPersistableRecord
+	public static func placeholder(_ value: Value) -> GRDBPersistableRecord
 	{
 		GRDBPersistableRecord(placeholderValue: value)
 	}

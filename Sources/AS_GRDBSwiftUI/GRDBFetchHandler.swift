@@ -1,5 +1,6 @@
 // AS_GRDBSwiftUI. Created by Apptek Studios 2020
 
+import Foundation
 import Combine
 import GRDB
 import GRDBCombine
@@ -16,11 +17,21 @@ public class GRDBFetchHandler<FetchRequest: GRDBFetchRequest>: ObservableObject
 		}
 	}
 
-	public var request: FetchRequest
+	public var fetchRequest: FetchRequest
 	{
 		didSet
 		{
 			setupPublisher()
+		}
+	}
+	
+	public var isLoadingInitialResult: Bool = true
+	{
+		willSet
+		{
+			if newValue != isLoadingInitialResult {
+				objectWillChange.send()
+			}
 		}
 	}
 
@@ -33,7 +44,7 @@ public class GRDBFetchHandler<FetchRequest: GRDBFetchRequest>: ObservableObject
 	{
 		database = db
 		result = request.defaultResult
-		self.request = request
+		self.fetchRequest = request
 		setupPublisher()
 	}
 
@@ -45,20 +56,23 @@ public class GRDBFetchHandler<FetchRequest: GRDBFetchRequest>: ObservableObject
 	private init(fakeResult: FetchRequest.Result, request: FetchRequest)
 	{
 		database = nil
-		self.request = request
+		self.fetchRequest = request
 		result = fakeResult
+		isLoadingInitialResult = false
 	}
 
 	func setupPublisher()
 	{
 		guard let database = database else { return }
 		publisher = ValueObservation
-			.tracking(value: request.request)
+			.tracking(value: fetchRequest.defineRequest)
 			.publisher(in: database)
-			.replaceError(with: request.defaultResult)
+			.replaceError(with: fetchRequest.defaultResult)
+			.subscribe(on: DispatchQueue.main)
 			.eraseToAnyPublisher()
 		subscription = publisher?.sink { [weak self] result in
 			self?.result = result
+			self?.isLoadingInitialResult = false
 		}
 	}
 }
