@@ -11,14 +11,15 @@ public protocol GRDBFetchRequest
 {
 	associatedtype Result
 	var defaultResult: Result { get }
-	func defineRequest(db: GRDB.Database) throws -> Result
-	
-	func makeRequest(_ databaseReader: DatabaseReader) throws -> Result
+	func onRead(db: GRDB.Database) throws -> Result
+
+	func executeRequest(_ databaseReader: DatabaseReader) throws -> Result
 }
 
-public extension GRDBFetchRequest {
-	func makeRequest(_ databaseReader: DatabaseReader) throws -> Result {
-		try databaseReader.read(defineRequest)
+public extension GRDBFetchRequest
+{
+	func executeRequest(_ databaseReader: DatabaseReader) throws -> Result {
+		try databaseReader.read(onRead)
 	}
 }
 
@@ -54,7 +55,7 @@ public struct GRDBSimpleFetchRequest<FetchResult>
 public struct PlaceholderFetchRequest<FetchResult>: GRDBFetchRequest
 {
 	public var defaultResult: FetchResult
-	public func defineRequest(db _: GRDB.Database) throws -> FetchResult {
+	public func onRead(db _: GRDB.Database) throws -> FetchResult {
 		defaultResult
 	}
 }

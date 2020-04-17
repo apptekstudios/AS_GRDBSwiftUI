@@ -6,7 +6,8 @@ import SwiftUI
 
 struct PlayerLeaderboardView: View
 {
-	@ObservedObject var databaseFetch = GRDBFetchHandler(db: AppDatabase.shared.db, request: HallOfFame.DatabaseRequest())
+	@GRDBFetch(db: AppDatabase.shared.db, request: HallOfFame.DatabaseRequest())
+	var databaseFetchResult
 
 	var body: some View
 	{
@@ -18,9 +19,9 @@ struct PlayerLeaderboardView: View
 			}
 			.navigationBarItems(trailing:
 				Button(action: {
-					self.databaseFetch.request.sortOrder.toggle()
+					self.$databaseFetchResult.request.sortOrder.toggle()
 					}) {
-					Text("Sort: \(self.databaseFetch.request.sortOrder.displayLabel)")
+					Text("Sort: \(self.$databaseFetchResult.request.sortOrder.displayLabel)")
 				}
 			)
 			.navigationBarTitle(Text("Leaderboard"))
@@ -29,7 +30,7 @@ struct PlayerLeaderboardView: View
 
 	var count: some View
 	{
-		Text("\(databaseFetch.result.playerCount) \(databaseFetch.result.playerCount == 1 ? "Player" : "Players") in total")
+		Text("\(databaseFetchResult.playerCount) \(databaseFetchResult.playerCount == 1 ? "Player" : "Players") in total")
 			.padding()
 			.frame(maxWidth: .infinity)
 			.background(Color(.secondarySystemBackground))
@@ -38,11 +39,11 @@ struct PlayerLeaderboardView: View
 	var list: some View
 	{
 		List {
-			ForEach(databaseFetch.result.bestPlayers) {
+			ForEach(databaseFetchResult.bestPlayers) {
 				PlayerRow(player: $0)
 			}
 			.onDelete { indexSet in
-				let toDelete = indexSet.map { self.databaseFetch.result.bestPlayers[$0] }
+				let toDelete = indexSet.map { self.databaseFetchResult.bestPlayers[$0] }
 
 				do
 				{

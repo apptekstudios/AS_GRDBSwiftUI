@@ -18,7 +18,7 @@ struct HallOfFame
 		var sortOrder: Player.SortOrder = .score
 
 		var defaultResult = HallOfFame()
-		func request(db: Database) throws -> HallOfFame {
+		func onRead(db: Database) throws -> HallOfFame {
 			let playerCount = try Player.fetchCount(db)
 			let bestPlayers = try Player
 				.limit(maxPlayerCount)

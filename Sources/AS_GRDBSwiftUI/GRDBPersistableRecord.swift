@@ -13,13 +13,15 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 	public var value: Value
 	{
 		get { _value }
-		set {
+		set
+		{
 			_value = newValue
 			autosavePublisher?.send()
 		}
 	}
-	
-	private var _value: Value {
+
+	private var _value: Value
+	{
 		willSet
 		{
 			objectWillChange.send()
@@ -50,7 +52,7 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 	public init(database: DatabaseWriter, value: Value, autoSave: Bool = true)
 	{
 		self.database = database
-		self._value = value
+		_value = value
 
 		if autoSave
 		{
@@ -65,6 +67,7 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 					catch
 					{
 						// Ignoring errors for autosave
+						print("Unable to save record due to error: \(error.localizedDescription)")
 					}
 				}
 		}
