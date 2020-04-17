@@ -3,14 +3,56 @@
 import Combine
 import Foundation
 import GRDB
+import SwiftUI
 
 /// An observable object that holds a `MutablePersistableRecord` and allows mutation + updating the database row
-@dynamicMemberLookup
-public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableObject
+@propertyWrapper
+public struct GRDBPersistableRecord<Value: MutablePersistableRecord>: DynamicProperty
 {
-	let database: DatabaseWriter?
+	@ObservedObject
+	var store: GRDBRecordStore<Value>
 
-	public var value: Value
+	@Environment(\.grdbDatabaseWriter)
+	var databaseWriter
+
+	public init(_ wrappedValue: Value, autoSave: Bool = false)
+	{
+		store = GRDBRecordStore(database: nil, value: wrappedValue, autoSave: autoSave)
+	}
+
+	public var wrappedValue: Value
+	{
+		get { store.value }
+		nonmutating set { store.value = newValue }
+	}
+
+	public func commitChanges() throws
+	{
+		try store.commitChanges()
+	}
+
+	public func update()
+	{
+		store.database = databaseWriter
+	}
+
+	public var projectedValue: Binding<Value>
+	{
+		Binding(
+			get: {
+				self.store.value
+			},
+			set: {
+				self.store.value = $0
+		})
+	}
+}
+
+internal class GRDBRecordStore<Value: MutablePersistableRecord>: ObservableObject
+{
+	var database: DatabaseWriter?
+
+	var value: Value
 	{
 		get { _value }
 		set
@@ -49,7 +91,7 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 	/// - parameter database: The database to save any changes to.
 	/// - parameter value: The initial value
 	/// - parameter autoSave: Whether to automatically commit any changes to the database. Default = true
-	public init(database: DatabaseWriter, value: Value, autoSave: Bool = true)
+	public init(database: DatabaseWriter?, value: Value, autoSave: Bool = true)
 	{
 		self.database = database
 		_value = value
@@ -84,15 +126,8 @@ public class GRDBPersistableRecord<Value: MutablePersistableRecord>: ObservableO
 		autosavePublisher = nil
 	}
 
-	public static func placeholder(_ value: Value) -> GRDBPersistableRecord
+	public static func placeholder(_ value: Value) -> GRDBRecordStore<Value>
 	{
-		GRDBPersistableRecord(placeholderValue: value)
-	}
-
-	/// Allows for directly accessing/editing variables in the stored value
-	public subscript<T>(dynamicMember keyPath: WritableKeyPath<Value, T>) -> T
-	{
-		get { value[keyPath: keyPath] }
-		set { value[keyPath: keyPath] = newValue }
+		GRDBRecordStore(placeholderValue: value)
 	}
 }

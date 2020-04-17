@@ -12,18 +12,18 @@ public struct GRDBFetch<FetchRequest: GRDBFetchRequest>: DynamicProperty
 {
 	@ObservedObject
 	var handler: GRDBFetchHandler<FetchRequest>
-	
-	//@Environment(\.grdbDatabaseReader)
-	//var databaseReader
+
+	@Environment(\.grdbDatabaseReader)
+	var databaseReader
 
 	public var wrappedValue: FetchRequest.Result
 	{
 		handler.result
 	}
 
-	public init(db: DatabaseReader, request: FetchRequest)
+	public init(request: FetchRequest)
 	{
-		handler = GRDBFetchHandler(db: db, request: request)
+		handler = GRDBFetchHandler(db: nil, request: request)
 	}
 
 	// Use this init to mock a fetch request, returning a specific result (eg. useful while designing a view)
@@ -35,7 +35,9 @@ public struct GRDBFetch<FetchRequest: GRDBFetchRequest>: DynamicProperty
 	public var request: FetchRequest
 	{
 		get { handler.fetchRequest }
-		nonmutating set { handler.fetchRequest = newValue }
+		nonmutating set {
+			handler.fetchRequest = newValue
+		}
 	}
 
 	public var isLoadingInitialResult: Bool
@@ -46,6 +48,11 @@ public struct GRDBFetch<FetchRequest: GRDBFetchRequest>: DynamicProperty
 	public var projectedValue: Self
 	{
 		self
+	}
+
+	public func update()
+	{
+		handler.database = databaseReader
 	}
 }
 
@@ -79,12 +86,21 @@ class GRDBFetchHandler<FetchRequest: GRDBFetchRequest>: ObservableObject
 		}
 	}
 
-	private var database: DatabaseReader?
+	var database: DatabaseReader?
+	{
+		didSet
+		{
+			if database !== oldValue, database != nil
+			{
+				setupPublisher()
+			}
+		}
+	}
 
 	private var subscription: AnyCancellable?
 	private var publisher: AnyPublisher<FetchRequest.Result, Never>?
 
-	init(db: DatabaseReader, request: FetchRequest)
+	init(db: DatabaseReader?, request: FetchRequest)
 	{
 		database = db
 		result = request.defaultResult

@@ -6,8 +6,8 @@ import SwiftUI
 
 struct PlayerEditingView: View
 {
-	@ObservedObject
-	var player: GRDBPersistableRecord<Player>
+	@GRDBPersistableRecord
+	var player: Player
 
 	@Environment(\.presentationMode) var presentation
 
@@ -42,7 +42,7 @@ struct PlayerEditingView: View
 				Button(action: {
 					do
 					{
-						try self.player.commitChanges()
+						try self._player.commitChanges()
 						self.presentation.wrappedValue.dismiss()
 					}
 					catch
@@ -64,7 +64,7 @@ struct PlayerEditingView_Previews: PreviewProvider
 {
 	static var previews: some View
 	{
-		PlayerEditingView(player: .init(database: AppDatabase.shared.db, value: Player(name: "Test player", score: 99)))
+		PlayerEditingView(player: .init(Player(name: "Test player", score: 99)))
 	}
 }
 

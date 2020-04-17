@@ -6,7 +6,7 @@ import SwiftUI
 
 struct PlayerLeaderboardView: View
 {
-	@GRDBFetch(db: AppDatabase.shared.db, request: HallOfFame.DatabaseRequest())
+	@GRDBFetch(request: HallOfFame.DatabaseRequest())
 	var databaseFetchResult
 
 	var body: some View
@@ -94,7 +94,7 @@ struct PlayerRow: View
 
 	var body: some View
 	{
-		NavigationLink(destination: PlayerEditingView(player: GRDBPersistableRecord(database: AppDatabase.shared.db, value: player, autoSave: false))) {
+		NavigationLink(destination: PlayerEditingView(player: GRDBPersistableRecord(player, autoSave: false))) {
 			HStack {
 				Text(player.name)
 				Spacer()
