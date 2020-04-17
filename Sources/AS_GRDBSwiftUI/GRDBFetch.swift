@@ -5,6 +5,7 @@ import Foundation
 import GRDB
 import GRDBCombine
 import SwiftUI
+import os.log
 
 /// An dynamic property wrapper that observes a database request and updates its value with any changes
 @propertyWrapper
@@ -52,6 +53,11 @@ public struct GRDBFetch<FetchRequest: GRDBFetchRequest>: DynamicProperty
 
 	public func update()
 	{
+		#if DEBUG
+		if databaseReader == nil {
+			os_log("‼️ No GRDB database passed to SwiftUI environment. Use the `.attachDatabase` modifier (in SceneDelegate or elsewhere). This will fail silently in release builds.", log: OSLog.default, type: .error)
+		}
+		#endif
 		handler.database = databaseReader
 	}
 }

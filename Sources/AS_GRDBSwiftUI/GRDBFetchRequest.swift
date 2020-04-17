@@ -23,7 +23,7 @@ public extension GRDBFetchRequest
 	}
 }
 
-public struct GRDBSimpleFetchRequest<FetchResult>
+public struct GRDBClosureFetchRequest<FetchResult>
 {
 	public typealias RequestClosure = ((_ database: Database) throws -> FetchResult)
 
