@@ -79,3 +79,100 @@ extension Player
 		}
 	}
 }
+
+import AS_GRDBSwiftUI
+import Foundation
+
+extension Player
+{
+	struct DeleteRequest: GRDBWriteRequest
+	{
+		func onWrite(db: Database, value: Player) throws
+		{
+			try value.delete(db)
+		}
+	}
+
+	struct DeleteAllPlayersRequest: GRDBWriteRequest
+	{
+		func onWrite(db: Database, value: Void) throws
+		{
+			try Player.deleteAll(db)
+		}
+	}
+
+	struct RefreshPlayersRequest: GRDBWriteRequest
+	{
+		func onWrite(db: Database, value: Void) throws
+		{
+			if try Player.fetchCount(db) == 0
+			{
+				// Insert new random players
+				for _ in 0 ..< 8
+				{
+					var player = Player.random()
+					try player.insert(db)
+				}
+			}
+			else
+			{
+				// Insert a player
+				if Bool.random()
+				{
+					var player = Player.random()
+					try player.insert(db)
+				}
+				// Delete a random player
+				if Bool.random()
+				{
+					try Player.order(sql: "RANDOM()").limit(1).deleteAll(db)
+				}
+				// Update some players
+				for var player in try Player.fetchAll(db) where Bool.random()
+				{
+					player.score = Player.Random.randomScore()
+					try player.update(db)
+				}
+			}
+		}
+	}
+
+	static func stressTest(_ db: DatabaseWriter)
+	{
+		for _ in 0 ..< 50
+		{
+			DispatchQueue.global().async {
+				try? RefreshPlayersRequest().executeRequest(inDB: db)
+			}
+		}
+	}
+}
+
+extension Player
+{
+	struct Random
+	{
+		private static let names = ["Arthur", "Anita", "Barbara", "Bernard", "Clément", "Chiara", "David",
+									"Dean", "Éric", "Elena", "Fatima", "Frederik", "Gilbert", "Georgette",
+									"Henriette", "Hassan", "Ignacio", "Irene", "Julie", "Jack", "Karl",
+									"Kristel", "Louis", "Liz", "Masashi", "Mary", "Noam", "Nolwenn",
+									"Ophelie", "Oleg", "Pascal", "Patricia", "Quentin", "Quinn", "Raoul",
+									"Rachel", "Stephan", "Susie", "Tristan", "Tatiana", "Ursule", "Urbain",
+									"Victor", "Violette", "Wilfried", "Wilhelmina", "Yvon", "Yann",
+									"Zazie", "Zoé"]
+		static func randomName() -> String
+		{
+			names.randomElement()!
+		}
+
+		static func randomScore() -> Int
+		{
+			10 * Int.random(in: 0 ... 100)
+		}
+	}
+
+	static func random() -> Player
+	{
+		Player(id: nil, name: Random.randomName(), score: Random.randomScore())
+	}
+}

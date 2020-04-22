@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B81D58F02439963200A834B5 /* PlayerEditingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B81D58EF2439963200A834B5 /* PlayerEditingView.swift */; };
-		B85C801D2439A2E90096491C /* Players.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85C801B2439A2E90096491C /* Players.swift */; };
 		B85C801E2439A2E90096491C /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85C801C2439A2E90096491C /* Player.swift */; };
 		B8AD23A724397E990043DCA4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AD23A624397E990043DCA4 /* AppDelegate.swift */; };
 		B8AD23A924397E990043DCA4 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8AD23A824397E990043DCA4 /* SceneDelegate.swift */; };
@@ -23,7 +22,6 @@
 
 /* Begin PBXFileReference section */
 		B81D58EF2439963200A834B5 /* PlayerEditingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerEditingView.swift; sourceTree = "<group>"; };
-		B85C801B2439A2E90096491C /* Players.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Players.swift; sourceTree = "<group>"; };
 		B85C801C2439A2E90096491C /* Player.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		B8AD23A324397E990043DCA4 /* GRDBDemo-SwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GRDBDemo-SwiftUI.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B8AD23A624397E990043DCA4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -53,7 +51,6 @@
 		B85C801A2439A2E90096491C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				B85C801B2439A2E90096491C /* Players.swift */,
 				B8CCC58B243AFA7B00DF018E /* HallOfFame.swift */,
 				B85C801C2439A2E90096491C /* Player.swift */,
 			);
@@ -207,7 +204,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd BuildTools\nSDKROOT=macosx\n#Temporarily uncomment the following line to update your packages (based on the versions defined in BuildTools/Package.swift)\n#swift package update\n\n#swift run -c release swiftformat \"$SRCROOT/../\"\n";
+			shellScript = "cd BuildTools\nSDKROOT=macosx\n#Temporarily uncomment the following line to update your packages (based on the versions defined in BuildTools/Package.swift)\n#swift package update\n\nswift run -c release swiftformat \"$SRCROOT/../\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -217,7 +214,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				B8CCC58C243AFA7B00DF018E /* HallOfFame.swift in Sources */,
-				B85C801D2439A2E90096491C /* Players.swift in Sources */,
 				B8AD23A724397E990043DCA4 /* AppDelegate.swift in Sources */,
 				B81D58F02439963200A834B5 /* PlayerEditingView.swift in Sources */,
 				B8AD23A924397E990043DCA4 /* SceneDelegate.swift in Sources */,

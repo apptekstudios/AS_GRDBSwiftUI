@@ -6,7 +6,7 @@ import SwiftUI
 
 struct PlayerEditingView: View
 {
-	@GRDBPersistableRecord
+	@GRDBPersistable
 	var player: Player
 
 	@Environment(\.presentationMode) var presentation

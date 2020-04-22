@@ -9,6 +9,9 @@ struct PlayerLeaderboardView: View
 	@GRDBFetch(request: HallOfFame.DatabaseRequest())
 	var databaseFetchResult
 
+	// Used for the toolbar buttons (not required for the Fetch above to work)
+	@Environment(\.grdbDatabaseWriter) var database
+
 	var body: some View
 	{
 		NavigationView {
@@ -73,15 +76,27 @@ struct PlayerLeaderboardView: View
 	{
 		HStack {
 			Button(
-				action: { try? Players.deleteAll(AppDatabase.shared.db) },
+				action: {
+					self.database.map {
+						try? Player.DeleteAllPlayersRequest().executeRequest(inDB: $0)
+					}
+				},
 				label: { Image(systemName: "trash") })
 			Spacer()
 			Button(
-				action: { try? Players.refresh(AppDatabase.shared.db) },
+				action: {
+					self.database.map {
+						try? Player.RefreshPlayersRequest().executeRequest(inDB: $0)
+					}
+				},
 				label: { Image(systemName: "arrow.clockwise") })
 			Spacer()
 			Button(
-				action: { Players.stressTest(AppDatabase.shared.db) },
+				action: {
+					self.database.map {
+						Player.stressTest($0)
+					}
+				},
 				label: { Text("💣") })
 		}
 		.padding()
@@ -94,7 +109,7 @@ struct PlayerRow: View
 
 	var body: some View
 	{
-		NavigationLink(destination: PlayerEditingView(player: GRDBPersistableRecord(player, autoSave: false))) {
+		NavigationLink(destination: PlayerEditingView(player: GRDBPersistable(player, autoSave: false))) {
 			HStack {
 				Text(player.name)
 				Spacer()

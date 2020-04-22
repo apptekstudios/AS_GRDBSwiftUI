@@ -60,7 +60,7 @@ struct AppDatabase
 			// Populate the players table with random data
 			for _ in 0 ..< 8
 			{
-				var player = Player(id: nil, name: Players.randomName(), score: Players.randomScore())
+				var player = Player.random()
 				try player.insert(db)
 			}
 		}
