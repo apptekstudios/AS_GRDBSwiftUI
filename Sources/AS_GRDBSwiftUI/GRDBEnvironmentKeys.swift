@@ -24,6 +24,7 @@ public extension EnvironmentValues
 
 public extension View
 {
+	@inlinable //Needed for Swift compiler bug (release config) when extending view in module
 	func attachDatabase(_ database: DatabaseWriter) -> some View
 	{
 		environment(\.grdbDatabaseWriter, database)
